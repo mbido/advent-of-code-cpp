@@ -15,7 +15,10 @@ endif()
 
 include_directories(include)
 
-# Scan récursif pour trouver tous les jours dans src/YEAR/dayDAY
+# Support OpenMP
+find_package(OpenMP)
+
+# Scan récursif pour trouver tous les jours dans src/YEAR/dayDAY/main.cpp
 file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*/day*/main.cpp)
 
 foreach(SOURCE_FILE ${SOURCES})
@@ -26,6 +29,11 @@ foreach(SOURCE_FILE ${SOURCES})
         set(EXE_NAME "aoc_${YEAR}_${DAY}")
         
         add_executable(${EXE_NAME} ${SOURCE_FILE})
+        
+        if(OpenMP_CXX_FOUND)
+            target_link_libraries(${EXE_NAME} PUBLIC OpenMP::OpenMP_CXX)
+        endif()
+
         # On définit le répertoire de travail pour que les chemins relatifs vers data/ fonctionnent
         set_target_properties(${EXE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
     endif()
