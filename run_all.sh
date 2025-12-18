@@ -5,7 +5,16 @@
 #   ./run_all.sh          (Runs all years)
 #   ./run_all.sh 2025     (Runs only 2025)
 
-SELECTED_YEAR=$1
+SELECTED_YEAR=""
+COLD_MODE=false
+
+for arg in "$@"; do
+    if [ "$arg" == "-cold" ]; then
+        COLD_MODE=true
+    else
+        SELECTED_YEAR="$arg"
+    fi
+done
 
 # 1. Compile everything
 mkdir -p build
@@ -21,6 +30,15 @@ echo "------------------------------------------------"
 
 TOTAL_TIME=0
 COUNT=0
+
+drop_caches() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sudo purge
+    else
+        sync
+        echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
+    fi
+}
 
 # Find all years in src/
 YEARS=$(ls src/ | grep -E '^[0-9]+$' | sort)
@@ -40,8 +58,15 @@ for YEAR in $YEARS; do
             EXE="aoc_${YEAR}_${DAY_NUM}"
 
             if [ -f "build/$EXE" ]; then
+                ARGS="-silent"
+                
+                if [ "$COLD_MODE" = true ]; then
+                    drop_caches
+                    ARGS="$ARGS -nobench"
+                fi
+
                 # Run in silent mode to get just the microseconds
-                TIME=$(./build/"$EXE" -silent 2>/dev/null)
+                TIME=$(./build/"$EXE" $ARGS 2>/dev/null)
                 EXIT_CODE=$?
                 
                 # Check if TIME is a valid number and exit code is 0
