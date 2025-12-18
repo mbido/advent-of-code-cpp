@@ -1,42 +1,39 @@
-# Advent of Code C++ High Performance
+# Advent of Code - High-Performance C++ Template
 
-Structure optimisée pour la performance utilisant `mmap` et des flags de compilation agressifs, supportant plusieurs années.
+This repository contains my personal C++ setup for solving [Advent of Code](https://adventofcode.com/) challenges with a focus on extreme performance. It uses memory-mapped files (`mmap`) for lightning-fast I/O and custom parsing utilities to squeeze every bit of speed out of each puzzle.
 
-## Structure
-- `src/<YEAR>/day<XX>/` : Code source pour chaque jour.
-- `include/utils.hpp` : Fonctions utilitaires (mmap, parsing rapide, benchmark).
-- `data/<YEAR>/` : Vos fichiers d'input (`dayXX.txt`) et de test (`testXX.txt`).
-- `template/` : Le template utilisé pour les nouveaux jours.
+## Project Structure
 
-## Utilisation
+- `src/<year>/day<xx>/`: Where the magic happens (source code).
+- `include/utils.hpp`: The "fast engine" – includes `mmap` wrappers, high-speed parsing, and benchmarking tools.
+- `data/<year>/`: Your puzzle inputs (`dayxx.txt`) and examples (`testxx.txt`).
+- `template/`: The boilerplate used to kickstart each new day.
 
-### 1. Créer un nouveau jour
+## Getting Started
+
+### 1. Initialize a New Day
+To scaffold a new challenge, just run the helper script with the year and day:
 ```bash
 ./new_day.sh 2025 01
 ```
-Ceci créera `src/2025/day01/main.cpp`, `data/2025/day01.txt` et `data/2025/test01.txt`.
+This creates your source file in `src/2025/day01/` and sets up empty data files in `data/2025/`.
 
-### 2. Compiler et Exécuter
-Le script `run.sh` s'occupe de tout (cmake, build, run) :
+### 2. Build & Run
+The `run.sh` script is your swiss-army knife. It handles CMake configuration, compilation, and execution in one go:
+
 ```bash
+# Run the solution on real input
 ./run.sh 2025 01
-```
-Pour tester avec le fichier d'exemple :
-```bash
+
+# Run using the test/example input
 ./run.sh 2025 01 -test
-```
-Pour désactiver le benchmark (exécution unique) :
-```bash
+
+# Run without the benchmark (single execution)
 ./run.sh 2025 01 -nobench
 ```
-On peut combiner les deux : `./run.sh 2025 01 -test -nobench`.
 
-## Fonctionnalités "High Performance"
-- **Accès Fichier** : `aoc::MappedFile` utilise `mmap` pour un accès mémoire direct sans copie (Zero-copy).
-- **Parsing** : `aoc::fast_atoi` et `aoc::skip_non_digits` pour éviter le surpoids de la STL.
-- **Benchmark** : Chaque solution est lancée 1000 fois (après warmup) pour obtenir le temps minimal précis en microsecondes.
-- **Optimisations** : Flags `-O3`, `-march=native` et `-flto` activés par défaut en mode Release.
+## Tips
+- **Testing**: Toggle between real data and examples using the `-test` flag – no need to change your code.
+- **IntelliSense**: The project generates `compile_commands.json` automatically, so VS Code should provide perfect autocompletion and error checking out of the box.
 
-## Astuces
-- Pour tester avec l'exemple, décommentez la ligne correspondante au début de la fonction `solve()` dans votre fichier `main.cpp`.
-- Utilisez `std::string_view` pour manipuler les segments de texte sans allocation.
+Happy coding and may your solutions run in sub-microsecond time! 🚀
