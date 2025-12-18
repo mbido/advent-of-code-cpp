@@ -42,8 +42,3 @@ To see the total execution time for all implemented challenges:
 ./run_all.sh 2025
 ```
 
-## Why this is fast
-- **Testing**: Toggle between real data and examples using the `-test` flag – no need to change your code.
-- **IntelliSense**: The project generates `compile_commands.json` automatically, so VS Code should provide perfect autocompletion and error checking out of the box.
-
-Happy coding and may your solutions run in sub-microsecond time! 🚀
