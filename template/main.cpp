@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
       if (run_bench) {
         aoc::run_benchmark([&](bool s) { solve(filename.c_str(), s); }, 1000);
       } else {
-        std::cout << "Time: " << elapsed.count() << " us\n";
+        std::cout << "Time: " << elapsed.count() << " μs\n";
       }
     } else {
       if (run_bench) {
