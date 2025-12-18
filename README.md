@@ -32,7 +32,17 @@ The `run.sh` script is your swiss-army knife. It handles CMake configuration, co
 ./run.sh 2025 01 -nobench
 ```
 
-## Tips
+### 3. Run Everything
+To see the total execution time for all implemented challenges:
+```bash
+# Run all years
+./run_all.sh
+
+# Run a specific year
+./run_all.sh 2025
+```
+
+## Why this is fast
 - **Testing**: Toggle between real data and examples using the `-test` flag – no need to change your code.
 - **IntelliSense**: The project generates `compile_commands.json` automatically, so VS Code should provide perfect autocompletion and error checking out of the box.
 
