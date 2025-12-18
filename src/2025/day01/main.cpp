@@ -8,8 +8,8 @@ void solve(const char *filename, bool silent = false) {
   const char *p = input.begin();
   const char *end = input.end();
 
-  long long part1 = 0;
-  long long part2 = 0;
+  uint64_t part1 = 0;
+  uint64_t part2 = 0;
   int current_pos = 50;
 
   while (p < end) {
@@ -19,7 +19,7 @@ void solve(const char *filename, bool silent = false) {
       break;
 
     char dir = *p++;
-    long long dist = aoc::fast_atoi<long long>(p);
+    uint64_t dist = aoc::fast_atoi<uint64_t>(p);
 
     if (dir == 'L') {
       int dist_to_zero = (current_pos == 0) ? 100 : current_pos;

@@ -2,13 +2,65 @@
 
 #include <charconv>
 #include <fcntl.h>
+#include <fmt/format.h>
 #include <iostream>
 #include <string_view>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <vector>
 
 namespace aoc {
+
+// ---- math helper ----
+
+std::vector<uint64_t> power_of_10 = {
+    1,
+    10,
+    100,
+    1000,
+    10000,
+    100000,
+    1000000,
+    10000000,
+    100000000,
+    1000000000,
+    10000000000,
+    100000000000,
+    1000000000000,
+    10000000000000,
+    100000000000000,
+    1000000000000000,
+    10000000000000000,
+    100000000000000000,
+    1000000000000000000,
+};
+
+template <std::integral T> constexpr T power(T base, long long exp) {
+  T res = 1;
+  while (exp > 0) {
+    if (exp % 2 == 1)
+      res *= base;
+    base *= base;
+    exp /= 2;
+  }
+  return res;
+}
+
+inline int get_digit_count_32bit(uint32_t v) {
+  if (v < 10000) {
+    if (v < 100)
+      return (v < 10) ? 1 : 2;
+    return (v < 1000) ? 3 : 4;
+  }
+  if (v < 100000000) {
+    if (v < 1000000)
+      return (v < 100000) ? 5 : 6;
+    return (v < 10000000) ? 7 : 8;
+  }
+  return (v < 1000000000) ? 9 : 10;
+}
+// ---------------------
 
 class MappedFile {
 public:
@@ -100,8 +152,8 @@ void run_benchmark(Func &&func, int iterations = 5000) {
   std::chrono::duration<double, std::micro> total_elapsed = end - start;
 
   std::cout << "\n--- Benchmark (" << iterations << " iterations) ---\n";
-  std::cout << "Best time: " << min_time << " us\n";
-  std::cout << "Average:   " << total_elapsed.count() / iterations << " us\n";
+  std::cout << "Best time: " << min_time << " μs\n";
+  std::cout << "Average:   " << total_elapsed.count() / iterations << " μs\n";
   std::cout << "-----------------------------------\n";
 }
 

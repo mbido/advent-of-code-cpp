@@ -18,6 +18,17 @@ include_directories(include)
 # Support OpenMP
 find_package(OpenMP)
 
+# Support fmt
+find_package(fmt CONFIG)
+if(NOT fmt_FOUND)
+    find_package(fmt)
+endif()
+if(fmt_FOUND)
+    message(STATUS "Found fmt: ${fmt_DIR}")
+else()
+    message(WARNING "fmt not found!")
+endif()
+
 # Scan récursif pour trouver tous les jours dans src/YEAR/dayDAY/main.cpp
 file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*/day*/main.cpp)
 
@@ -32,6 +43,15 @@ foreach(SOURCE_FILE ${SOURCES})
         
         if(OpenMP_CXX_FOUND)
             target_link_libraries(${EXE_NAME} PUBLIC OpenMP::OpenMP_CXX)
+        endif()
+        
+        if(fmt_FOUND)
+            target_link_libraries(${EXE_NAME} PUBLIC fmt::fmt)
+            # S'assurer que les en-têtes sont trouvés même si fmt::fmt ne propage pas correctement
+            get_target_property(fmt_include_dir fmt::fmt INTERFACE_INCLUDE_DIRECTORIES)
+            if(fmt_include_dir)
+                target_include_directories(${EXE_NAME} PUBLIC ${fmt_include_dir})
+            endif()
         endif()
 
         # On définit le répertoire de travail pour que les chemins relatifs vers data/ fonctionnent

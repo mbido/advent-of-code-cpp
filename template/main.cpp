@@ -8,8 +8,8 @@ void solve(const char *filename, bool silent = false) {
   const char *p = input.begin();
   const char *end = input.end();
 
-  long long part1 = 0;
-  long long part2 = 0;
+  uint64_t part1 = 0;
+  uint64_t part2 = 0;
 
   if (!silent) {
     std::cout << "Part 1: " << part1 << "\n";

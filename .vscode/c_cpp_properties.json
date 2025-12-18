@@ -4,7 +4,9 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "/opt/homebrew/include",
+                "/opt/homebrew/anaconda3/include"
             ],
             "defines": [],
             "macFrameworkPath": [
