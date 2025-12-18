@@ -128,8 +128,13 @@ inline void skip_non_digits(const char *&p) {
     ++p;
 }
 
+struct BenchmarkResult {
+  double best_time;
+  double average_time;
+};
+
 template <typename Func>
-void run_benchmark(Func &&func, int iterations = 5000) {
+BenchmarkResult measure_benchmark(Func &&func, int iterations = 1000) {
   // Warmup
   for (int i = 0; i < 10; ++i) {
     func(true);
@@ -151,9 +156,16 @@ void run_benchmark(Func &&func, int iterations = 5000) {
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double, std::micro> total_elapsed = end - start;
 
+  return {min_time, total_elapsed.count() / iterations};
+}
+
+template <typename Func>
+void run_benchmark(Func &&func, int iterations = 1000) {
+  BenchmarkResult res = measure_benchmark(std::forward<Func>(func), iterations);
+
   std::cout << "\n--- Benchmark (" << iterations << " iterations) ---\n";
-  std::cout << "Best time: " << min_time << " μs\n";
-  std::cout << "Average:   " << total_elapsed.count() / iterations << " μs\n";
+  std::cout << "Best time: " << res.best_time << " μs\n";
+  std::cout << "Average:   " << res.average_time << " μs\n";
   std::cout << "-----------------------------------\n";
 }
 

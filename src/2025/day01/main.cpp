@@ -49,6 +49,7 @@ void solve(const char *filename, bool silent = false) {
 int main(int argc, char **argv) {
   std::string filename = "data/2025/day01.txt";
   bool run_bench = true;
+  bool silent = false;
 
   for (int i = 1; i < argc; ++i) {
     std::string_view arg(argv[i]);
@@ -56,15 +57,36 @@ int main(int argc, char **argv) {
       filename = "data/2025/test01.txt";
     } else if (arg == "-nobench") {
       run_bench = false;
+    } else if (arg == "-silent") {
+      silent = true;
     }
   }
 
-  std::cout << "--- Running on: " << filename << " ---\n";
-  std::cout << "--- Results ---\n";
-  solve(filename.c_str(), false);
+  if (!silent) {
+    std::cout << "--- Running on: " << filename << " ---\n";
+    std::cout << "--- Results ---\n";
+  }
 
-  if (run_bench) {
-    aoc::run_benchmark([&](bool s) { solve(filename.c_str(), s); }, 5000);
+  auto start = std::chrono::high_resolution_clock::now();
+  solve(filename.c_str(), silent);
+  auto end = std::chrono::high_resolution_clock::now();
+
+  std::chrono::duration<double, std::micro> elapsed = end - start;
+
+  if (!silent) {
+    if (run_bench) {
+      aoc::run_benchmark([&](bool s) { solve(filename.c_str(), s); }, 1000);
+    } else {
+      std::cout << "Time: " << elapsed.count() << " us\n";
+    }
+  } else {
+    if (run_bench) {
+      auto res =
+          aoc::measure_benchmark([&](bool s) { solve(filename.c_str(), s); }, 1000);
+      std::cout << res.best_time;
+    } else {
+      std::cout << elapsed.count();
+    }
   }
 
   return 0;
