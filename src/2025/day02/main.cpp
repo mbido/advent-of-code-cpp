@@ -17,6 +17,46 @@ inline uint64_t get_multiplier(int L, int TotalLen) {
   return m;
 }
 
+// Fonction helper pour la Partie 2
+// Calcule la somme des IDs invalides dans [start, end] pour une longueur FIXE
+// 'len'
+inline uint64_t solve_part2_range(uint64_t start, uint64_t end, uint16_t len) {
+  if (len < 2)
+    return 0;
+
+  uint64_t range_total = 0;
+  std::array<uint64_t, 10> prim_sums{};
+
+  for (uint16_t L = 1; L <= len / 2; L++) {
+    if (len % L != 0)
+      continue;
+
+    uint64_t M = get_multiplier(L, len);
+
+    uint64_t P_min = (start + M - 1) / M;
+    uint64_t P_max = end / M;
+
+    if (P_min > P_max) {
+      prim_sums[L] = 0;
+      continue;
+    }
+
+    uint64_t sum_calc = (P_min + P_max) * (P_max - P_min + 1) / 2;
+    uint64_t row_sum = sum_calc * M;
+
+    for (uint16_t d = 1; d <= L / 2; d++) {
+      if (L % d == 0) {
+        row_sum -= prim_sums[d];
+      }
+    }
+
+    prim_sums[L] = row_sum;
+    range_total += row_sum;
+  }
+
+  return range_total;
+}
+
 void solve(const char *filename, bool silent = false) {
   aoc::MappedFile input(filename);
   const char *p = input.begin();
@@ -27,20 +67,24 @@ void solve(const char *filename, bool silent = false) {
 
   while (p < end) {
 
-    uint64_t a = aoc::fast_atoi<uint64_t>(p);
+    uint64_t A = aoc::fast_atoi<uint64_t>(p);
+    uint64_t a = A;
 
     while (p < end && *p != '-')
       p++;
     p++;
 
-    uint64_t b = aoc::fast_atoi<uint64_t>(p);
+    uint64_t B = aoc::fast_atoi<uint64_t>(p);
+    uint64_t b = B;
+
     uint64_t la = aoc::get_digit_count_32bit(a);
     uint64_t lb = aoc::get_digit_count_32bit(b);
     // we always have abs(la - lb) <= 1
     // if la % 2 == 1, a <- upper power of 10
     // if lb % 2 == 1, b <- lower power of 10
+
     if (la % 2 == 1) {
-      a = aoc::power_of_10[la + 1];
+      a = aoc::power_of_10[la];
       la++;
     }
     if (lb % 2 == 1) {
@@ -63,10 +107,8 @@ void solve(const char *filename, bool silent = false) {
     }
 
     xb = bd * mod + bd;
-    if (xb >= a && xb <= b) {
-      if (xb != xa) {
-        part1 += xb;
-      }
+    if (xb >= a && xb <= b && xb != xa) {
+      part1 += xb;
     }
 
     // adding invalides numbers in between
@@ -75,6 +117,18 @@ void solve(const char *filename, bool silent = false) {
       if (xe != xa && xe != xb && xe > a && xe < b) {
         part1 += xe;
       }
+    }
+
+    uint16_t lA = aoc::get_digit_count_32bit(A);
+    uint16_t lB = aoc::get_digit_count_32bit(B);
+
+    if (lA == lB) {
+      part2 += solve_part2_range(A, B, lA);
+    } else {
+      uint64_t end_A = aoc::power_of_10[lA] - 1;
+      part2 += solve_part2_range(A, end_A, lA);
+      uint64_t start_B = aoc::power_of_10[lA];
+      part2 += solve_part2_range(start_B, B, lB);
     }
 
     while (p < end && *p != ',')
