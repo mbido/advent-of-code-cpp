@@ -68,6 +68,11 @@ void solve(std::string_view input_data, bool silent = false) {
   uint64_t part2 = 0;
 
   while (p < end) {
+    // Skip non-digits to handle newlines and commas robustly
+    while (p < end && (*p < '0' || *p > '9') && *p != '-')
+      p++;
+    if (p >= end)
+      break;
 
     uint64_t A = aoc::fast_atoi<uint64_t>(p);
     uint64_t a = A;
@@ -141,6 +146,9 @@ void solve(std::string_view input_data, bool silent = false) {
   if (!silent) {
     std::cout << "Part 1: " << part1 << "\n";
     std::cout << "Part 2: " << part2 << "\n";
+  } else {
+    aoc::DoNotOptimize(part1);
+    aoc::DoNotOptimize(part2);
   }
 }
 
@@ -184,7 +192,7 @@ int main(int argc, char **argv) {
       if (run_bench) {
         auto res = aoc::measure_benchmark(
             [&](bool s) { solve(input, s); }, 1000);
-        std::cout << res.best_time;
+        std::cout << res.average_time;
       } else {
         std::cout << elapsed.count();
       }

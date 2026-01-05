@@ -1,8 +1,10 @@
 #pragma once
 
 #include <charconv>
+#include <chrono>
 #include <fcntl.h>
 #include <fmt/format.h>
+#include <iomanip>
 #include <iostream>
 #include <string_view>
 #include <sys/mman.h>
@@ -128,8 +130,13 @@ inline void skip_non_digits(const char *&p) {
     ++p;
 }
 
+// Prevents compiler from optimizing away unused variables
+template <class T>
+inline void DoNotOptimize(T const& value) {
+  asm volatile("" : : "r,m"(value) : "memory");
+}
+
 struct BenchmarkResult {
-  double best_time;
   double average_time;
 };
 
@@ -141,22 +148,17 @@ BenchmarkResult measure_benchmark(Func &&func, int iterations = 1000) {
   }
 
   auto start = std::chrono::high_resolution_clock::now();
-  double min_time = 1e18;
 
   for (int i = 0; i < iterations; ++i) {
-    auto i_start = std::chrono::high_resolution_clock::now();
     func(true);
-    auto i_end = std::chrono::high_resolution_clock::now();
-
-    std::chrono::duration<double, std::micro> i_elapsed = i_end - i_start;
-    if (i_elapsed.count() < min_time)
-      min_time = i_elapsed.count();
   }
 
   auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double, std::micro> total_elapsed = end - start;
-
-  return {min_time, total_elapsed.count() / iterations};
+  // On calcule d'abord en nanosecondes (entier 64 bits) pour la précision brute
+  auto total_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+  
+  // Conversion finale en double (64 bits) pour la moyenne en microsecondes
+  return {static_cast<double>(total_ns) / (iterations * 1000.0)};
 }
 
 template <typename Func>
@@ -164,8 +166,7 @@ void run_benchmark(Func &&func, int iterations = 1000) {
   BenchmarkResult res = measure_benchmark(std::forward<Func>(func), iterations);
 
   std::cout << "\n--- Benchmark (" << iterations << " iterations) ---\n";
-  std::cout << "Best time: " << res.best_time << " μs\n";
-  std::cout << "Average:   " << res.average_time << " μs\n";
+  std::cout << "Average:   " << std::fixed << std::setprecision(6) << res.average_time << " μs\n";
   std::cout << "-----------------------------------\n";
 }
 

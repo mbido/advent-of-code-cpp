@@ -18,6 +18,9 @@ void solve(std::string_view input_data, bool silent = false) {
   if (!silent) {
     std::cout << "Part 1: " << part1 << "\n";
     std::cout << "Part 2: " << part2 << "\n";
+  } else {
+    aoc::DoNotOptimize(part1);
+    aoc::DoNotOptimize(part2);
   }
 }
 
@@ -63,7 +66,7 @@ int main(int argc, char **argv) {
       if (run_bench) {
         auto res = aoc::measure_benchmark(
             [&](bool s) { solve(input, s); }, 1000);
-        std::cout << res.best_time;
+        std::cout << res.average_time;
       } else {
         std::cout << elapsed.count();
       }

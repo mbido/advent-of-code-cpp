@@ -1,5 +1,5 @@
-#include "utils.hpp"
 #include "input.hpp"
+#include "utils.hpp"
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -44,6 +44,9 @@ void solve(std::string_view input_data, bool silent = false) {
   if (!silent) {
     std::cout << "Part 1: " << part1 << "\n";
     std::cout << "Part 2: " << part2 << "\n";
+  } else {
+    aoc::DoNotOptimize(part1);
+    aoc::DoNotOptimize(part2);
   }
 }
 
@@ -66,7 +69,8 @@ int main(int argc, char **argv) {
   std::string_view input = test_mode ? Input::test_data : Input::data;
 
   if (!silent) {
-    std::cout << "--- Running on: " << (test_mode ? "TEST DATA" : "REAL DATA") << " ---\n";
+    std::cout << "--- Running on: " << (test_mode ? "TEST DATA" : "REAL DATA")
+              << " ---\n";
     std::cout << "--- Results ---\n";
   }
 
@@ -79,15 +83,15 @@ int main(int argc, char **argv) {
 
     if (!silent) {
       if (run_bench) {
-        aoc::run_benchmark([&](bool s) { solve(input, s); }, 1000);
+        aoc::run_benchmark([&](bool s) { solve(input, s); }, 10000);
       } else {
         std::cout << "Time: " << elapsed.count() << " μs\n";
       }
     } else {
       if (run_bench) {
-        auto res = aoc::measure_benchmark(
-            [&](bool s) { solve(input, s); }, 1000);
-        std::cout << res.best_time;
+        auto res =
+            aoc::measure_benchmark([&](bool s) { solve(input, s); }, 10000);
+        std::cout << res.average_time;
       } else {
         std::cout << elapsed.count();
       }
