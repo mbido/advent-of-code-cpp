@@ -16,14 +16,8 @@ if [ -d "$DIR" ]; then
 fi
 
 mkdir -p "$DIR"
-mkdir -p "data/$YEAR"
 cp template/main.cpp "$DIR/main.cpp"
-touch "data/$YEAR/day$DAY.txt"
-touch "data/$YEAR/test$DAY.txt"
+cp template/input.hpp "$DIR/input.hpp"
 
-# Update data paths in the new file
-sed -i '' "s|data/dayXX.txt|data/$YEAR/day$DAY.txt|g" "$DIR/main.cpp"
-sed -i '' "s|data/dayXX_test.txt|data/$YEAR/test$DAY.txt|g" "$DIR/main.cpp"
-
-echo "Created $DIR and data/$YEAR/day$DAY.txt"
+echo "Created $DIR with main.cpp and input.hpp"
 echo "You can now run: ./run.sh $YEAR $DAY"

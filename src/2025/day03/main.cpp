@@ -1,8 +1,10 @@
 #include "utils.hpp"
+#include "input.hpp"
 #include <chrono>
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 inline const char *find_best_digit(const char *start, const char *end_limit) {
   if (start >= end_limit)
@@ -15,10 +17,9 @@ inline const char *find_best_digit(const char *start, const char *end_limit) {
   return start;
 }
 
-void solve(const char *filename, bool silent = false) {
-  aoc::MappedFile input(filename);
-  const char *p = input.begin();
-  const char *end = input.end();
+void solve(std::string_view input_data, bool silent = false) {
+  const char *p = input_data.begin();
+  const char *end = input_data.end();
 
   uint64_t part1 = 0;
   uint64_t part2 = 0;
@@ -76,14 +77,14 @@ void solve(const char *filename, bool silent = false) {
 }
 
 int main(int argc, char **argv) {
-  std::string filename = "data/2025/day03.txt";
   bool run_bench = true;
   bool silent = false;
+  bool test_mode = false;
 
   for (int i = 1; i < argc; ++i) {
     std::string_view arg(argv[i]);
     if (arg == "-test") {
-      filename = "data/2025/test03.txt";
+      test_mode = true;
     } else if (arg == "-nobench") {
       run_bench = false;
     } else if (arg == "-silent") {
@@ -91,28 +92,30 @@ int main(int argc, char **argv) {
     }
   }
 
+  std::string_view input = test_mode ? Input::test_data : Input::data;
+
   if (!silent) {
-    std::cout << "--- Running on: " << filename << " ---\n";
+    std::cout << "--- Running on: " << (test_mode ? "TEST DATA" : "REAL DATA") << " ---\n";
     std::cout << "--- Results ---\n";
   }
 
   try {
     auto start = std::chrono::high_resolution_clock::now();
-    solve(filename.c_str(), silent);
+    solve(input, silent);
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double, std::micro> elapsed = end - start;
 
     if (!silent) {
       if (run_bench) {
-        aoc::run_benchmark([&](bool s) { solve(filename.c_str(), s); }, 1000);
+        aoc::run_benchmark([&](bool s) { solve(input, s); }, 1000);
       } else {
         std::cout << "Time: " << elapsed.count() << " μs\n";
       }
     } else {
       if (run_bench) {
         auto res = aoc::measure_benchmark(
-            [&](bool s) { solve(filename.c_str(), s); }, 1000);
+            [&](bool s) { solve(input, s); }, 1000);
         std::cout << res.best_time;
       } else {
         std::cout << elapsed.count();
